@@ -33,11 +33,20 @@ $app->get('/marcasv2', function() use ($carros, $app) {
 	));
 });
 
+//Exemplo de registro de log e utilização
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => __DIR__.'/palestra.log',
+));
+
 //Executa a consulta e manda o resultado para o template posts.twig
 $app->get('/posts/{id}', function ($id) use ($app) {
     $sql = "SELECT * FROM posts WHERE id = ?";
     $post = $app['db']->fetchAssoc($sql, array((int) $id));
 
+    $app['monolog']->addInfo(sprintf("O título do post é '%s'.", $post["title"]));//Uitlizando o log do tipo informativo
+    $app['monolog']->addWarning(sprintf("O título do post é '%s'.", $post["title"]));//Utilizando log Do tipo aviso
+    $app['monolog']->addError(sprintf("O título do post é '%s'.", $post["title"]));//Utilizando o log do tipo erro
+    
     return $app['twig']->render('posts.twig', array(
 	     'posts' => $post,
 	));
